@@ -1542,6 +1542,77 @@ body {
     .pricing-card.featured:hover {
         transform: translateY(-8px);
     }
+    
+    /* Mobile button adjustments */
+    .cta-btn {
+        padding: 14px 24px;
+        font-size: 15px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .cta-btn.large {
+        padding: 16px 28px;
+        font-size: 16px;
+        min-height: 52px;
+    }
+    
+    .cta-btn.extra-large {
+        padding: 18px 32px;
+        font-size: 17px;
+        min-height: 56px;
+    }
+    
+    /* Cookie consent mobile */
+    .cookie-content {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+    
+    .cookie-actions {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+    
+    .cookie-btn {
+        width: 100%;
+        padding: 12px 20px;
+        min-height: 44px;
+    }
+    
+    /* Floating CTA mobile */
+    .floating-cta-btn {
+        padding: 12px 20px;
+        min-height: 44px;
+    }
+    
+    /* Hero CTA mobile */
+    .hero-cta {
+        gap: 12px;
+    }
+    
+    .hero-cta .cta-btn {
+        width: 100%;
+        max-width: 280px;
+    }
+    
+    /* Pricing buttons mobile */
+    .pricing-btn {
+        padding: 14px 20px;
+        min-height: 48px;
+    }
+    
+    /* Feature CTA mobile */
+    .feature-cta {
+        padding: 10px 16px;
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1555,18 +1626,72 @@ body {
     
     .feature-card,
     .problem-card {
-        padding: 24px;
+        padding: 20px;
     }
     
-    .cta-btn.large,
+    /* Small mobile button refinements */
+    .cta-btn {
+        padding: 12px 20px;
+        font-size: 14px;
+        min-height: 44px;
+    }
+    
+    .cta-btn.large {
+        padding: 14px 24px;
+        font-size: 15px;
+        min-height: 48px;
+    }
+    
     .cta-btn.extra-large {
-        padding: 16px 24px;
+        padding: 16px 28px;
         font-size: 16px;
+        min-height: 52px;
     }
     
     .cta-subtext {
         flex-direction: column;
         gap: 8px;
+    }
+    
+    /* Header CTA mobile */
+    .cta-btn-header {
+        padding: 10px 18px;
+        font-size: 14px;
+        min-height: 40px;
+    }
+    
+    /* Floating CTA adjustment */
+    .floating-cta {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        padding: 12px 16px;
+    }
+    
+    .floating-cta-btn {
+        padding: 10px 16px;
+        font-size: 14px;
+        min-height: 40px;
+    }
+    
+    /* Cookie buttons small mobile */
+    .cookie-btn {
+        padding: 10px 16px;
+        font-size: 14px;
+        min-height: 42px;
+    }
+    
+    /* Play button mobile */
+    .play-btn {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+    
+    .play-btn i {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
     }
 }
 
