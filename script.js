@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeFAQ();
     initializeMobileMenu();
     initializeVideoModal();
+    initializeCookieConsent();
 });
 
 // Animate on Scroll (Simple implementation)
@@ -630,6 +631,105 @@ if (!window.requestAnimationFrame) {
     };
 }
 
+// Cookie Consent Management
+function initializeCookieConsent() {
+    const cookieConsent = document.getElementById('cookieConsent');
+    
+    // Set up button event listeners
+    const acceptBtn = document.querySelector('.cookie-btn.accept');
+    const customizeBtn = document.querySelector('.cookie-btn.customize');
+    const declineBtn = document.querySelector('.cookie-btn.decline');
+    
+    if (acceptBtn) {
+        acceptBtn.addEventListener('click', acceptCookies);
+    }
+    if (customizeBtn) {
+        customizeBtn.addEventListener('click', customizeCookies);
+    }
+    if (declineBtn) {
+        declineBtn.addEventListener('click', declineCookies);
+    }
+    
+    // Check if user has already made a choice
+    const cookieChoice = localStorage.getItem('cookieConsent');
+    
+    if (!cookieChoice) {
+        // Show banner after 2 seconds
+        setTimeout(() => {
+            if (cookieConsent) {
+                cookieConsent.classList.add('show');
+            }
+        }, 2000);
+    } else {
+        // Apply previous choice
+        if (cookieChoice === 'accepted') {
+            enableAllCookies();
+        }
+    }
+}
+
+function acceptCookies() {
+    localStorage.setItem('cookieConsent', 'accepted');
+    document.getElementById('cookieConsent').classList.remove('show');
+    enableAllCookies();
+    
+    trackEvent('cookie_consent', {
+        event_category: 'compliance',
+        consent_type: 'accepted'
+    });
+}
+
+function customizeCookies() {
+    // For now, redirect to privacy policy
+    // In a full implementation, you'd show a detailed cookie settings modal
+    localStorage.setItem('cookieConsent', 'customized');
+    document.getElementById('cookieConsent').classList.remove('show');
+    
+    alert('Cookie customization coming soon. For now, only essential cookies are enabled.');
+    
+    trackEvent('cookie_consent', {
+        event_category: 'compliance',
+        consent_type: 'customized'
+    });
+}
+
+function declineCookies() {
+    localStorage.setItem('cookieConsent', 'declined');
+    document.getElementById('cookieConsent').classList.remove('show');
+    
+    // Disable non-essential cookies
+    disableNonEssentialCookies();
+    
+    trackEvent('cookie_consent', {
+        event_category: 'compliance',
+        consent_type: 'declined'
+    });
+}
+
+function enableAllCookies() {
+    // Enable Google Analytics and other tracking
+    if (typeof gtag !== 'undefined') {
+        gtag('consent', 'update', {
+            'analytics_storage': 'granted',
+            'ad_storage': 'granted',
+            'functionality_storage': 'granted',
+            'personalization_storage': 'granted'
+        });
+    }
+}
+
+function disableNonEssentialCookies() {
+    // Disable non-essential tracking
+    if (typeof gtag !== 'undefined') {
+        gtag('consent', 'update', {
+            'analytics_storage': 'denied',
+            'ad_storage': 'denied',
+            'functionality_storage': 'denied',
+            'personalization_storage': 'denied'
+        });
+    }
+}
+
 // Export functions for testing (if needed)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -637,6 +737,8 @@ if (typeof module !== 'undefined' && module.exports) {
         showNotification,
         nextTestimonial,
         previousTestimonial,
-        toggleFAQ
+        toggleFAQ,
+        acceptCookies,
+        declineCookies
     };
 }
