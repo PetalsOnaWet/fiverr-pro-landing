@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Test - Fiverr Pro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .video-test {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            display: block;
+            border-radius: 8px;
+        }
+        .test-btn {
+            background: #1DBF73;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .test-btn:hover {
+            background: #19A463;
+        }
+        .result {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎥 Video Test Page</h1>
+        <p>This page tests if your MP4 video file can be played correctly.</p>
+        
+        <h2>Test 1: Direct Video Element</h2>
+        <video class="video-test" controls preload="metadata">
+            <source src="fivverpro.mp4" type="video/mp4">
+            <source src="./fivverpro.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div id="direct-test-result" class="result info">
+            Click play button above to test direct video playback.
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test 2: Dynamic Video Loading (Same as Landing Page)</h2>
+        <button class="test-btn" onclick="testDynamicVideo()">Test Dynamic Video</button>
+        <div id="dynamic-video-container" style="width: 100%; height: 300px; background: #000; border-radius: 8px; margin: 20px 0; position: relative;">
+            <p style="color: white; text-align: center; padding: 20px;">Click the button above to load video dynamically</p>
+        </div>
+        <div id="dynamic-test-result" class="result info">
+            Click the button above to test dynamic video loading.
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test 3: File Information</h2>
+        <div id="file-info" class="result info">
+            Checking file information...
+        </div>
+        <button class="test-btn" onclick="checkFileAccess()">Check File Access</button>
+    </div>
+
+    <div class="test-container">
+        <h2>Test 4: Troubleshooting</h2>
+        <div class="result info">
+            <strong>Common issues and solutions:</strong>
+            <ul>
+                <li><strong>Black screen:</strong> Video codec not supported by browser</li>
+                <li><strong>No controls:</strong> File path incorrect or file corrupted</li>
+                <li><strong>Loading forever:</strong> File too large or server restrictions</li>
+                <li><strong>Audio only:</strong> Video codec missing, audio codec works</li>
+            </ul>
+        </div>
+        
+        <h3>Quick fixes to try:</h3>
+        <button class="test-btn" onclick="openInNewTab()">Open Video in New Tab</button>
+        <button class="test-btn" onclick="downloadVideo()">Download Video</button>
+        <button class="test-btn" onclick="testVideoInfo()">Get Video Info</button>
+    </div>
+
+    <script>
+        // Test dynamic video loading (same as landing page)
+        function testDynamicVideo() {
+            const container = document.getElementById('dynamic-video-container');
+            const result = document.getElementById('dynamic-test-result');
+            
+            container.innerHTML = `
+                <video controls preload="metadata" style="width: 100%; height: 100%; border-radius: 8px; background: #000;">
+                    <source src="./fivverpro.mp4" type="video/mp4">
+                    <source src="fivverpro.mp4" type="video/mp4">
+                    <p style="color: white; text-align: center; padding: 20px;">
+                        Browser does not support video tag.
+                    </p>
+                </video>
+            `;
+            
+            const video = container.querySelector('video');
+            let loadResult = 'Testing...';
+            
+            video.addEventListener('loadstart', () => {
+                result.innerHTML = 'Video loading started...';
+                result.className = 'result info';
+            });
+            
+            video.addEventListener('loadeddata', () => {
+                result.innerHTML = '✅ Video data loaded successfully!';
+                result.className = 'result success';
+            });
+            
+            video.addEventListener('canplay', () => {
+                result.innerHTML = '✅ Video ready to play! Duration: ' + Math.round(video.duration) + ' seconds';
+                result.className = 'result success';
+            });
+            
+            video.addEventListener('error', (e) => {
+                result.innerHTML = '❌ Video error: ' + (video.error ? video.error.message : 'Unknown error');
+                result.className = 'result error';
+            });
+            
+            // Timeout test
+            setTimeout(() => {
+                if (video.readyState < 2) {
+                    result.innerHTML = '⚠️ Video taking too long to load. Check file size and format.';
+                    result.className = 'result error';
+                }
+            }, 10000);
+        }
+        
+        // Check file access
+        function checkFileAccess() {
+            fetch('fivverpro.mp4', { method: 'HEAD' })
+                .then(response => {
+                    const info = document.getElementById('file-info');
+                    if (response.ok) {
+                        const size = response.headers.get('content-length');
+                        const type = response.headers.get('content-type');
+                        info.innerHTML = `
+                            ✅ File accessible!<br>
+                            Size: ${size ? Math.round(size/1024/1024) + ' MB' : 'Unknown'}<br>
+                            Type: ${type || 'Unknown'}
+                        `;
+                        info.className = 'result success';
+                    } else {
+                        info.innerHTML = '❌ File not accessible. Status: ' + response.status;
+                        info.className = 'result error';
+                    }
+                })
+                .catch(error => {
+                    const info = document.getElementById('file-info');
+                    info.innerHTML = '❌ Error accessing file: ' + error.message;
+                    info.className = 'result error';
+                });
+        }
+        
+        // Open in new tab
+        function openInNewTab() {
+            window.open('fivverpro.mp4', '_blank');
+        }
+        
+        // Download video
+        function downloadVideo() {
+            const a = document.createElement('a');
+            a.href = 'fivverpro.mp4';
+            a.download = 'fivverpro.mp4';
+            a.click();
+        }
+        
+        // Test video info
+        function testVideoInfo() {
+            const video = document.createElement('video');
+            video.src = 'fivverpro.mp4';
+            video.preload = 'metadata';
+            
+            video.addEventListener('loadedmetadata', () => {
+                alert(`Video Info:
+Duration: ${Math.round(video.duration)} seconds
+Width: ${video.videoWidth}px
+Height: ${video.videoHeight}px`);
+            });
+            
+            video.addEventListener('error', () => {
+                alert('Cannot load video metadata. File may be corrupted or unsupported format.');
+            });
+        }
+        
+        // Auto-run file check on page load
+        window.addEventListener('load', () => {
+            setTimeout(checkFileAccess, 1000);
+        });
+    </script>
+</body>
+</html>

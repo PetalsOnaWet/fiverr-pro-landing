@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Fiverr Pro Landing Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #1DBF73;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #19A463;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Fiverr Pro Landing Page - Interactive Test</h1>
+    
+    <div class="test-section">
+        <h2>Quick Test Summary</h2>
+        <div id="test-summary" class="status info">
+            Running tests... Please wait.
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Manual Tests</h2>
+        <p>Click the buttons below to test specific interactions:</p>
+        
+        <button class="test-button" onclick="testCarousel()">Test Carousel</button>
+        <button class="test-button" onclick="testFAQ()">Test FAQ</button>
+        <button class="test-button" onclick="testMobileMenu()">Test Mobile Menu</button>
+        <button class="test-button" onclick="testVideo()">Test Video Modal</button>
+        <button class="test-button" onclick="testFloatingCTA()">Test Floating CTA</button>
+        
+        <div id="manual-test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Page Performance</h2>
+        <div id="performance-results" class="status info">
+            Loading performance data...
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Links to Test</h2>
+        <ul>
+            <li><a href="index.html" target="_blank">Main Landing Page</a></li>
+            <li><a href="index.html#how-it-works" target="_blank">How It Works Section</a></li>
+            <li><a href="index.html#success-stories" target="_blank">Success Stories Section</a></li>
+            <li><a href="index.html#pricing" target="_blank">Pricing Section</a></li>
+            <li><a href="fivverpro.mp4" target="_blank">Local Video File</a></li>
+        </ul>
+    </div>
+
+    <script>
+        // Test functions
+        function testCarousel() {
+            const result = document.getElementById('manual-test-results');
+            result.innerHTML = '<div class="status info">Testing carousel... Check the main page for testimonial navigation.</div>';
+            
+            // Open main page in new tab
+            window.open('index.html', '_blank');
+            
+            setTimeout(() => {
+                result.innerHTML += '<div class="status success">✓ Carousel test initiated. Check the main page for working testimonial navigation.</div>';
+            }, 1000);
+        }
+        
+        function testFAQ() {
+            const result = document.getElementById('manual-test-results');
+            result.innerHTML = '<div class="status info">Testing FAQ... Opening main page to test FAQ interactions.</div>';
+            
+            window.open('index.html#faq', '_blank');
+            
+            setTimeout(() => {
+                result.innerHTML += '<div class="status success">✓ FAQ test initiated. Click on FAQ questions to test expand/collapse.</div>';
+            }, 1000);
+        }
+        
+        function testMobileMenu() {
+            const result = document.getElementById('manual-test-results');
+            result.innerHTML = '<div class="status info">Testing mobile menu... Resize browser window to mobile size and test hamburger menu.</div>';
+            
+            window.open('index.html', '_blank');
+            
+            setTimeout(() => {
+                result.innerHTML += '<div class="status success">✓ Mobile menu test initiated. Resize browser window and test menu toggle.</div>';
+            }, 1000);
+        }
+        
+        function testVideo() {
+            const result = document.getElementById('manual-test-results');
+            result.innerHTML = '<div class="status info">Testing video modal... Click "Watch Success Stories" button on main page.</div>';
+            
+            window.open('index.html', '_blank');
+            
+            setTimeout(() => {
+                result.innerHTML += '<div class="status success">✓ Video test initiated. Click the play button in the hero section.</div>';
+            }, 1000);
+        }
+        
+        function testFloatingCTA() {
+            const result = document.getElementById('manual-test-results');
+            result.innerHTML = '<div class="status info">Testing floating CTA... Scroll down on main page to see floating CTA appear.</div>';
+            
+            window.open('index.html', '_blank');
+            
+            setTimeout(() => {
+                result.innerHTML += '<div class="status success">✓ Floating CTA test initiated. Scroll down to see the floating CTA appear.</div>';
+            }, 1000);
+        }
+        
+        // Automatic tests
+        function runAutomaticTests() {
+            const summary = document.getElementById('test-summary');
+            const tests = [];
+            
+            // Test 1: Check if main files exist
+            fetch('index.html')
+                .then(response => {
+                    if (response.ok) {
+                        tests.push('✓ index.html exists and loads');
+                    } else {
+                        tests.push('✗ index.html not found');
+                    }
+                })
+                .catch(() => {
+                    tests.push('✗ index.html load failed');
+                })
+                .finally(() => updateSummary());
+            
+            fetch('styles.css')
+                .then(response => {
+                    if (response.ok) {
+                        tests.push('✓ styles.css exists and loads');
+                    } else {
+                        tests.push('✗ styles.css not found');
+                    }
+                })
+                .catch(() => {
+                    tests.push('✗ styles.css load failed');
+                })
+                .finally(() => updateSummary());
+            
+            fetch('script.js')
+                .then(response => {
+                    if (response.ok) {
+                        tests.push('✓ script.js exists and loads');
+                    } else {
+                        tests.push('✗ script.js not found');
+                    }
+                })
+                .catch(() => {
+                    tests.push('✗ script.js load failed');
+                })
+                .finally(() => updateSummary());
+            
+            function updateSummary() {
+                if (tests.length >= 3) {
+                    const passedTests = tests.filter(t => t.startsWith('✓')).length;
+                    const totalTests = tests.length;
+                    
+                    if (passedTests === totalTests) {
+                        summary.className = 'status success';
+                        summary.innerHTML = `All ${totalTests} basic tests passed!<br>${tests.join('<br>')}`;
+                    } else {
+                        summary.className = 'status error';
+                        summary.innerHTML = `${passedTests}/${totalTests} tests passed<br>${tests.join('<br>')}`;
+                    }
+                }
+            }
+        }
+        
+        // Performance test
+        function testPerformance() {
+            const perfResults = document.getElementById('performance-results');
+            
+            if ('performance' in window) {
+                const loadTime = Math.round(performance.now());
+                perfResults.innerHTML = `
+                    <strong>Page Load Performance:</strong><br>
+                    • Test page load time: ${loadTime}ms<br>
+                    • Status: ${loadTime < 1000 ? '✓ Good' : loadTime < 3000 ? '⚠ Fair' : '✗ Slow'}<br>
+                    <em>Main landing page performance may vary</em>
+                `;
+                perfResults.className = loadTime < 1000 ? 'status success' : 'status info';
+            } else {
+                perfResults.innerHTML = '⚠ Performance API not available';
+                perfResults.className = 'status info';
+            }
+        }
+        
+        // Run tests on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            runAutomaticTests();
+            setTimeout(testPerformance, 500);
+        });
+    </script>
+</body>
+</html>
