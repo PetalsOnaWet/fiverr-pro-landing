@@ -378,29 +378,70 @@ function showNotification(message, type = 'info') {
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                padding: 16px 20px;
-                border-radius: 8px;
+                max-width: 400px;
+                padding: 20px 24px;
+                border-radius: 12px;
                 background: white;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                box-shadow: 0 8px 32px rgba(0,0,0,0.12);
                 z-index: 10000;
                 display: flex;
-                align-items: center;
-                gap: 12px;
-                animation: slideInDown 0.3s ease;
+                align-items: flex-start;
+                gap: 16px;
+                animation: slideInDown 0.4s ease;
+                font-size: 15px;
+                line-height: 1.5;
             }
-            .notification-success { border-left: 4px solid #1DBF73; }
-            .notification-error { border-left: 4px solid #FF6B35; }
-            .notification-info { border-left: 4px solid #007cba; }
+            .notification-success { 
+                border-left: 4px solid #1DBF73;
+                background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+            }
+            .notification-error { 
+                border-left: 4px solid #FF6B35;
+                background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+            }
+            .notification-info { 
+                border-left: 4px solid #3b82f6;
+                background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+            }
+            .notification span {
+                flex: 1;
+                color: #374151;
+            }
+            .notification a {
+                color: #1DBF73;
+                text-decoration: underline;
+                font-weight: 500;
+            }
+            .notification a:hover {
+                color: #19A463;
+            }
             .notification button {
                 background: none;
                 border: none;
-                font-size: 18px;
+                font-size: 20px;
                 cursor: pointer;
-                color: #999;
+                color: #9ca3af;
+                padding: 2px;
+                border-radius: 4px;
+                transition: all 0.2s ease;
+                flex-shrink: 0;
+            }
+            .notification button:hover {
+                background: #f3f4f6;
+                color: #6b7280;
             }
             @keyframes slideInDown {
-                from { transform: translateY(-100px); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
+                from { transform: translateY(-100px) translateX(20px); opacity: 0; }
+                to { transform: translateY(0) translateX(0); opacity: 1; }
+            }
+            @media (max-width: 480px) {
+                .notification {
+                    top: 10px;
+                    right: 10px;
+                    left: 10px;
+                    max-width: none;
+                    padding: 16px 20px;
+                }
             }
         `;
         document.head.appendChild(style);
@@ -408,11 +449,11 @@ function showNotification(message, type = 'info') {
     
     document.body.appendChild(notification);
     
-    // Auto-remove after 5 seconds
+    // Auto-remove after 8 seconds (longer for cookie info)
     setTimeout(() => {
-        notification.style.animation = 'slideInDown 0.3s ease reverse';
-        setTimeout(() => notification.remove(), 300);
-    }, 5000);
+        notification.style.animation = 'slideInDown 0.4s ease reverse';
+        setTimeout(() => notification.remove(), 400);
+    }, 8000);
 }
 
 // Analytics and Tracking
@@ -673,6 +714,9 @@ function acceptCookies() {
     document.getElementById('cookieConsent').classList.remove('show');
     enableAllCookies();
     
+    // Show success notification
+    showNotification('✅ Cookie preferences saved. All cookies enabled for better experience.', 'success');
+    
     trackEvent('cookie_consent', {
         event_category: 'compliance',
         consent_type: 'accepted'
@@ -685,7 +729,11 @@ function customizeCookies() {
     localStorage.setItem('cookieConsent', 'customized');
     document.getElementById('cookieConsent').classList.remove('show');
     
-    alert('Cookie customization coming soon. For now, only essential cookies are enabled.');
+    // Show elegant notification instead of alert
+    showNotification(
+        'Cookie customization coming soon. Only essential cookies are enabled for now. View our <a href="privacy-policy.html" style="color: #1DBF73; text-decoration: underline;">Privacy Policy</a> for details.',
+        'info'
+    );
     
     trackEvent('cookie_consent', {
         event_category: 'compliance',
@@ -699,6 +747,9 @@ function declineCookies() {
     
     // Disable non-essential cookies
     disableNonEssentialCookies();
+    
+    // Show informative notification
+    showNotification('Cookie preferences saved. Only essential cookies are enabled.', 'info');
     
     trackEvent('cookie_consent', {
         event_category: 'compliance',
