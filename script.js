@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeMobileMenu();
     initializeVideoModal();
     initializeCookieConsent();
+    initializeConversionTracking();
 });
 
 // Animate on Scroll (Simple implementation)
@@ -781,15 +782,338 @@ function disableNonEssentialCookies() {
     }
 }
 
+// Enhanced Conversion Tracking System
+function initializeConversionTracking() {
+    // Define conversion button mapping
+    const conversionButtons = {
+        // Primary CTAs (highest value)
+        primary_cta: {
+            selectors: [
+                'a[href*="go.fiverr.com"][class*="cta-btn primary large"]', // Hero main CTA
+                'a[href*="go.fiverr.com"][class*="cta-btn primary extra-large"]', // Final CTA
+                'a[href*="go.fiverr.com"][class*="pricing-btn"]' // Pricing CTAs
+            ],
+            value: 10,
+            category: 'high_intent_conversion'
+        },
+        
+        // Secondary CTAs (medium value)
+        secondary_cta: {
+            selectors: [
+                'a[href*="go.fiverr.com"][class*="cta-btn secondary"]', // Problem section CTA
+                'a[href*="go.fiverr.com"][class*="cta-btn-header"]', // Header CTA
+                'a[href*="go.fiverr.com"][class*="feature-cta"]', // Feature CTAs
+                'a[href*="go.fiverr.com"][class*="step-cta"]' // How it works CTAs
+            ],
+            value: 7,
+            category: 'medium_intent_conversion'
+        },
+        
+        // Navigation/Engagement (lower value but important for funnel)
+        engagement: {
+            selectors: [
+                '.play-btn', // Video play button
+                '.faq-question', // FAQ toggles
+                '.mobile-menu-toggle', // Mobile menu
+                'a[href^="#"]' // Internal anchor links
+            ],
+            value: 3,
+            category: 'user_engagement'
+        }
+    };
+    
+    // Track all conversion buttons
+    Object.entries(conversionButtons).forEach(([buttonType, config]) => {
+        config.selectors.forEach(selector => {
+            document.querySelectorAll(selector).forEach(element => {
+                trackButtonClicks(element, buttonType, config);
+            });
+        });
+    });
+    
+    // Track form interactions
+    trackFormInteractions();
+    
+    // Track video engagement
+    trackVideoEngagement();
+    
+    // Track scroll milestones for conversion optimization
+    trackScrollMilestones();
+}
+
+function trackButtonClicks(element, buttonType, config) {
+    element.addEventListener('click', function(e) {
+        const buttonText = this.textContent.trim();
+        const buttonHref = this.href || '';
+        const section = getPageSection(this);
+        const isExternalLink = buttonHref.includes('go.fiverr.com');
+        
+        // Create detailed event data
+        const eventData = {
+            event_category: config.category,
+            event_label: buttonText,
+            value: config.value,
+            button_type: buttonType,
+            page_section: section,
+            button_position: getElementPosition(this),
+            is_conversion: isExternalLink,
+            destination_url: buttonHref
+        };
+        
+        // Track the event
+        trackButtonClick(buttonType, eventData);
+        
+        // For external Fiverr Pro links, track as conversion
+        if (isExternalLink) {
+            trackConversion(buttonText, section, config.value);
+        }
+        
+        // Add visual feedback for better UX
+        addClickFeedback(this);
+    });
+}
+
+function trackButtonClick(buttonType, eventData) {
+    // Main tracking event
+    trackEvent('button_click', eventData);
+    
+    // Additional conversion-specific tracking
+    if (eventData.is_conversion) {
+        trackEvent('fiverr_pro_click', {
+            event_category: 'conversion',
+            event_label: eventData.event_label,
+            value: eventData.value,
+            section: eventData.page_section
+        });
+        
+        // Enhanced e-commerce tracking for GA4
+        trackEvent('generate_lead', {
+            event_category: 'conversion',
+            currency: 'USD',
+            value: eventData.value,
+            lead_source: 'fiverr_pro_cta',
+            button_text: eventData.event_label,
+            page_section: eventData.page_section
+        });
+    }
+}
+
+function trackConversion(buttonText, section, value) {
+    // Primary conversion event
+    trackEvent('conversion', {
+        event_category: 'goal_completion',
+        event_label: `${section}_${buttonText}`,
+        value: value,
+        conversion_type: 'fiverr_pro_referral'
+    });
+    
+    // Google Ads conversion tracking (if conversion ID is set)
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'conversion', {
+            'send_to': 'AW-CONVERSION_ID/CONVERSION_LABEL', // Replace with actual values
+            'value': value,
+            'currency': 'USD',
+            'transaction_id': Date.now().toString()
+        });
+    }
+    
+    // Facebook Pixel conversion
+    if (typeof fbq !== 'undefined') {
+        fbq('track', 'Lead', {
+            value: value,
+            currency: 'USD',
+            content_name: buttonText,
+            content_category: section
+        });
+    }
+}
+
+function trackFormInteractions() {
+    // Track form focus events
+    document.querySelectorAll('input, textarea, select').forEach(field => {
+        field.addEventListener('focus', function() {
+            trackEvent('form_field_focus', {
+                event_category: 'lead_generation',
+                field_name: this.name || this.id,
+                field_type: this.type
+            });
+        });
+        
+        // Track form completion progress
+        field.addEventListener('blur', function() {
+            if (this.value) {
+                trackEvent('form_field_complete', {
+                    event_category: 'lead_generation',
+                    field_name: this.name || this.id,
+                    progress: calculateFormProgress(this.form)
+                });
+            }
+        });
+    });
+}
+
+function trackVideoEngagement() {
+    document.querySelectorAll('.play-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            trackEvent('video_play', {
+                event_category: 'engagement',
+                event_label: 'success_stories_video',
+                value: 5
+            });
+        });
+    });
+    
+    // Track video modal interactions
+    const videoModal = document.getElementById('videoModal');
+    if (videoModal) {
+        videoModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                trackEvent('video_close', {
+                    event_category: 'engagement',
+                    event_label: 'modal_background_click'
+                });
+            }
+        });
+    }
+}
+
+function trackScrollMilestones() {
+    const sections = [
+        { name: 'hero', threshold: 10 },
+        { name: 'problem', threshold: 25 },
+        { name: 'solution', threshold: 40 },
+        { name: 'testimonials', threshold: 60 },
+        { name: 'pricing', threshold: 80 },
+        { name: 'final_cta', threshold: 95 }
+    ];
+    
+    let trackedMilestones = new Set();
+    
+    window.addEventListener('scroll', throttle(() => {
+        const scrollPercent = Math.round(
+            (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100
+        );
+        
+        sections.forEach(section => {
+            const milestoneKey = `${section.name}_${section.threshold}`;
+            if (scrollPercent >= section.threshold && !trackedMilestones.has(milestoneKey)) {
+                trackedMilestones.add(milestoneKey);
+                
+                trackEvent('scroll_milestone', {
+                    event_category: 'engagement',
+                    event_label: section.name,
+                    value: section.threshold,
+                    scroll_depth: scrollPercent
+                });
+            }
+        });
+    }, 500));
+}
+
+// Utility functions for tracking
+function getPageSection(element) {
+    const section = element.closest('section');
+    if (section) {
+        const className = section.className;
+        if (className.includes('hero')) return 'hero';
+        if (className.includes('problem')) return 'problem';
+        if (className.includes('solution')) return 'solution';
+        if (className.includes('social-proof')) return 'testimonials';
+        if (className.includes('pricing')) return 'pricing';
+        if (className.includes('how-it-works')) return 'how_it_works';
+        if (className.includes('faq')) return 'faq';
+        if (className.includes('final-cta')) return 'final_cta';
+    }
+    
+    const header = element.closest('header');
+    if (header) return 'header';
+    
+    const footer = element.closest('footer');
+    if (footer) return 'footer';
+    
+    return 'unknown';
+}
+
+function getElementPosition(element) {
+    const rect = element.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const position = rect.top / viewportHeight;
+    
+    if (position < 0.3) return 'above_fold';
+    if (position < 0.7) return 'mid_fold';
+    return 'below_fold';
+}
+
+function calculateFormProgress(form) {
+    if (!form) return 0;
+    const fields = form.querySelectorAll('input[required], textarea[required], select[required]');
+    const completed = form.querySelectorAll('input[required]:valid, textarea[required]:valid, select[required]:valid');
+    return Math.round((completed.length / fields.length) * 100);
+}
+
+function addClickFeedback(element) {
+    // Add subtle visual feedback
+    element.style.transform = 'scale(0.95)';
+    element.style.transition = 'transform 0.1s ease';
+    
+    setTimeout(() => {
+        element.style.transform = 'scale(1)';
+        setTimeout(() => {
+            element.style.transform = '';
+            element.style.transition = '';
+        }, 100);
+    }, 100);
+}
+
+// Advanced tracking for user behavior patterns
+function trackUserBehaviorPatterns() {
+    let mouseMovements = 0;
+    let clicks = 0;
+    let keystrokes = 0;
+    
+    document.addEventListener('mousemove', throttle(() => {
+        mouseMovements++;
+    }, 1000));
+    
+    document.addEventListener('click', () => {
+        clicks++;
+    });
+    
+    document.addEventListener('keydown', () => {
+        keystrokes++;
+    });
+    
+    // Send behavior data every 30 seconds
+    setInterval(() => {
+        if (mouseMovements > 0 || clicks > 0 || keystrokes > 0) {
+            trackEvent('user_behavior', {
+                event_category: 'engagement',
+                mouse_movements: mouseMovements,
+                clicks: clicks,
+                keystrokes: keystrokes
+            });
+            
+            // Reset counters
+            mouseMovements = clicks = keystrokes = 0;
+        }
+    }, 30000);
+}
+
+// Initialize advanced tracking
+trackUserBehaviorPatterns();
+
 // Export functions for testing (if needed)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         trackEvent,
+        trackButtonClick,
+        trackConversion,
         showNotification,
         nextTestimonial,
         previousTestimonial,
         toggleFAQ,
         acceptCookies,
-        declineCookies
+        declineCookies,
+        initializeConversionTracking
     };
 }
