@@ -1,0 +1,25 @@
+name = "workskillpro-redirect"
+main = "cloudflare-worker.js"
+compatibility_date = "2024-01-01"
+
+# KV namespace for storing redirect logs
+[[kv_namespaces]]
+binding = "REDIRECT_LOGS"
+id = "b5bf132fb0914d7dae54defdda8ae692"
+preview_id = "98cf30dd2094400f9af3eaf1e8640b0b"
+
+# KV namespace for storing all main domain access
+[[kv_namespaces]]
+binding = "ALL_ACCESS"
+id = "7aa6937ef41b496d9bc0780d0d1b2322"
+preview_id = "63d325a9221c4dfa870fcfd4a1892c8a"
+
+# Environment variables (optional)
+[vars]
+FIVERR_REDIRECT_URL = "https://go.fiverr.com/visit/?bta=1144956&brand=fp"
+LOG_RETENTION_DAYS = "30"
+
+# Routes configuration
+[[routes]]
+pattern = "workskillpro.online/*"
+zone_name = "workskillpro.online"
